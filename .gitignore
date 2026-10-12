@@ -1,0 +1,11 @@
+# Local publication state and private signing material
+.runtime/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+artifacts/
+__pycache__/
+.DS_Store
