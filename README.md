@@ -26,3 +26,7 @@
 
 固定模板包括 `standard-v1`、`restricted-v1`、`host-monitor-v1`。选择模板不能自行扩权：宿主监控仍需要后端的明确策略授予。发布私钥不进入本仓库；秘密参数不写进清单、图标或版本目录。
 Docker application manifests and publishing protocol for the NAS app store
+
+## 商店图文素材
+
+`catalog/display.json`、`apps/` 与 `assets/icons/` 提供七个应用的中文说明和图标，供网页、客户端及后台使用。这是展示目录；原签名执行协议与 drafts 的状态仍按上文说明。
