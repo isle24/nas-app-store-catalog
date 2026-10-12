@@ -1,0 +1,115 @@
+{
+  "items": [
+    {
+      "id": "uptime-kuma",
+      "icon": "https://raw.githubusercontent.com/isle24/nas-app-store-catalog/df21e7b/assets/icons/uptime-kuma.svg",
+      "name": "Uptime Kuma",
+      "image": "ghcr.io/louislam/uptime-kuma:2.5.6",
+      "version": "2.5.6",
+      "category": "monitoring",
+      "published": true,
+      "dataTargets": [
+        "/app/data"
+      ],
+      "description": "持续监测网站与服务的可用性，提供状态页面、历史记录和故障通知。",
+      "containerPort": 3001,
+      "releaseNumber": 1
+    },
+    {
+      "id": "navidrome",
+      "icon": "https://raw.githubusercontent.com/isle24/nas-app-store-catalog/df21e7b/assets/icons/navidrome.png",
+      "name": "Navidrome",
+      "image": "ghcr.io/navidrome/navidrome:0.64.2",
+      "version": "0.64.2",
+      "category": "music",
+      "published": true,
+      "dataTargets": [
+        "/data"
+      ],
+      "description": "扫描 NAS 音乐目录，按专辑和歌手管理音乐，支持网页与兼容 Subsonic 的客户端播放。",
+      "containerPort": 4533,
+      "releaseNumber": 1
+    },
+    {
+      "id": "jellyfin",
+      "icon": "https://raw.githubusercontent.com/isle24/nas-app-store-catalog/df21e7b/assets/icons/jellyfin.svg",
+      "name": "Jellyfin",
+      "image": "ghcr.io/jellyfin/jellyfin:12.2",
+      "version": "12.2",
+      "category": "video",
+      "published": true,
+      "dataTargets": [
+        "/config",
+        "/cache"
+      ],
+      "description": "建立个人电影、剧集和家庭视频资料库，整理海报与介绍，支持多设备播放。",
+      "containerPort": 8096,
+      "releaseNumber": 1
+    },
+    {
+      "id": "immich",
+      "icon": "https://raw.githubusercontent.com/isle24/nas-app-store-catalog/df21e7b/assets/icons/immich.svg",
+      "name": "Immich",
+      "image": "ghcr.io/immich-app/immich-server:v3.3.1",
+      "version": "3.3.1",
+      "category": "photos",
+      "published": true,
+      "dataTargets": [
+        "/data"
+      ],
+      "description": "管理和备份手机照片，提供时间线、人物识别和共享相册。安装包括照片服务、识别服务、数据库与缓存。",
+      "containerPort": 2283,
+      "releaseNumber": 1
+    },
+    {
+      "id": "syncthing",
+      "icon": "https://raw.githubusercontent.com/isle24/nas-app-store-catalog/df21e7b/assets/icons/syncthing.svg",
+      "name": "Syncthing",
+      "image": "ghcr.io/syncthing/syncthing:2.1.6",
+      "version": "2.1.6",
+      "category": "sync",
+      "published": true,
+      "dataTargets": [
+        "/var/syncthing",
+        "/var/syncthing/config",
+        "/var/syncthing/Sync"
+      ],
+      "description": "在 NAS 与电脑或手机之间同步专用文件夹，支持版本记录和端到端传输。",
+      "containerPort": 8384,
+      "releaseNumber": 1
+    },
+    {
+      "id": "nasreader",
+      "icon": "https://raw.githubusercontent.com/isle24/nas-app-store-catalog/df21e7b/assets/icons/nasreader.svg",
+      "name": "nasReader",
+      "image": "nasreader:free-platforms-reader-licensed-amd64-20261010",
+      "version": "0.1.0",
+      "category": "reading",
+      "published": true,
+      "dataTargets": [
+        "/data",
+        "/inbox"
+      ],
+      "description": "为 NAS 上的电子书提供阅读服务，支持已授权服务器归档与只读书库。",
+      "containerPort": 8080,
+      "releaseNumber": 1
+    },
+    {
+      "id": "memos",
+      "icon": "/api/cloud/icons/36d0d373f0495e677be1bb897980e72afb7ede278141b6c954724c665d095c20",
+      "name": "Memos",
+      "image": "ghcr.io/usememos/memos@sha256:8596928c21551afc7d4e100051510bc134fd0caae51ad1d26cf899845d719321",
+      "version": "stable",
+      "category": "tools",
+      "published": true,
+      "githubSync": "not-configured",
+      "dataTargets": [
+        "/var/opt/memos"
+      ],
+      "description": "轻量笔记与个人时间线，支持 Markdown、标签、搜索和附件，数据保存在自己的 NAS。",
+      "containerPort": 5230,
+      "releaseNumber": 1,
+      "manifestDigest": "afea0a76bdbad36e2fe7c85772078593fd3d29f3bdf9fec36b7d8018a56f8f41"
+    }
+  ]
+}

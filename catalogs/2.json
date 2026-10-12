@@ -1,0 +1,1 @@
+{"schemaVersion":"store.catalog.v1","sourceId":"zstore-catalog","sequence":2,"publishedAt":"2026-10-12T13:06:21Z","apps":[{"appId":"memos","latestReleaseId":"r1","releases":[{"releaseId":"r1","releaseNumber":1,"manifest":{"path":"manifests/memos/r1.json","sha256":"afea0a76bdbad36e2fe7c85772078593fd3d29f3bdf9fec36b7d8018a56f8f41","sizeBytes":1727}}]}],"withdrawn":[]}

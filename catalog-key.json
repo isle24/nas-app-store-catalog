@@ -1,0 +1,7 @@
+{
+  "algorithm": "Ed25519",
+  "keyId": "zstore-primary",
+  "publicKey": "iEHsdWqo8lReX88ntJIYKLL0n81zx7mk2MHS6qlsopU=",
+  "signingInput": "raw catalog payload bytes",
+  "sourceId": "zstore-catalog"
+}
