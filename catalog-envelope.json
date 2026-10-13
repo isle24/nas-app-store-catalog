@@ -1,1 +1,15 @@
-{"schemaVersion":"store.catalog-envelope.v1","payload":{"path":"catalogs/2.json","sha256":"84e6e6538488c0143a1df33364c87220c1ad3c4e1754088f3fb6d6d009ec33f8","sizeBytes":368},"signatures":[{"keyId":"zstore-primary","algorithm":"Ed25519","signature":"4utjcOfrW/yzvr14awHW5NkYD+QHUJ66740EjHgs5OJgLaX06EW7zNVMVMYFRGaN35uBm+twOpjjhN1FM+0bAA=="}]}
+{
+  "schemaVersion": "store.catalog-envelope.v1",
+  "payload": {
+    "path": "catalogs/8.json",
+    "sha256": "69bd47fe486d3c291860e3ae913fff9befc395f06a4e1654378bbdd91d2c31aa",
+    "sizeBytes": 1780
+  },
+  "signatures": [
+    {
+      "keyId": "zstore-primary",
+      "algorithm": "Ed25519",
+      "signature": "GkrUMin/PizkyuUPYTZYaIxhAsmC1G2pBFUBWOqOaJ10pbyZ31R28FvvHoXKvjR1gU7OkoF2+UQqdfelWPtcAw=="
+    }
+  ]
+}

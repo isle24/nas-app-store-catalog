@@ -1,32 +1,211 @@
-# NAS 应用商店目录
+# NAS 应用商店目录与部署
 
-通过声明式 JSON 清单上架 Docker 应用。商店后端统一管理 Docker，容器引用固定权限模板；新增应用只增加数据，无需逐应用修改商店代码。
+当前商店公开 176 条应用记录，其中 13 款提供安装入口，163 条资料明确标注待适配。飞牛来源的 175 项均已收录，另保留 nasReader；原生 FPK 与复杂 Docker 定义不会被伪装成可安装的单容器。
 
-本仓库维护应用清单与协议。应用软件从其原发布者的镜像仓库或经核验的作者交付获取，应用许可证记录在各自清单中。
+- 公共资料：`catalog-apps.json`，以及 [服务器公开目录](https://zstore.2iwm.com/api/cloud/public-catalog)。
+- 签名安装目录：`catalog-envelope.json`、`catalog-key.json`、`catalogs/` 与 `manifests/`。当前 7 个云交付使用原签名身份与不可变摘要，NAS 另有 6 个已审查的内置配方。
+- `drafts/` 保留历史协议示例，它们不是已发布安装源。`schemas/` 保存协议结构。
+- 用户账户、密码、令牌、签名私钥与 NAS 私有数据不在本仓库。
 
-## 当前内容
+源码在私有 [zspace-apps](https://github.com/isle24/zspace-apps)，使用 [UI 镜像](https://hub.docker.com/r/isle204/zspace-ui) 和 [后台镜像](https://hub.docker.com/r/isle204/zspace-store) 可直接部署。
 
-- `schemas/app-manifest.schema.json`：应用清单，支持单/多容器、依赖、TCP/UDP 端口、挂载、环境参数、健康检查和生命周期声明。
-- `schemas/catalog.schema.json`：带递增 sequence 的版本目录。
-- `schemas/catalog-envelope.schema.json`：目录原始字节的 SHA256、长度与 Ed25519 签名信封。
-- `schemas/openapi.json`：商店通用后端 `/api/store/v3` 的接口契约；正常管理员鉴权，原 v2 接口保持兼容。
-- `drafts/datatotal/`：固定 registry digest、两个 host listener 和管理员口令参数的清单草案。
-- `drafts/nasreader/`：固定历史服务器归档身份、只读书库与原生应用授权的清单草案。
+## Docker Compose 直接复制部署
 
-**当前是协议与清单草案仓库。通用后端正在实现，签名目录尚未发布；drafts 不能被当作可安装应用源。** 本仓库没有上传 nasReader 服务器归档、用户资料或发布私钥。
+镜像版本为 `2026.10.13-r3`，平台 `linux/amd64`。以下每段完整保存为各自目录的 `compose.yaml`，无需 `.env` 或宿主密码文件，也无需源码编译。
 
-## 后续上架流程
+## NAS 三方 UI
 
-1. 复制清单模板，填写 appId、交付 ID、递增 releaseNumber、名称和版本信息。
-2. 声明各服务镜像、端口、逻辑卷、依赖、安装参数和固定权限模板；镜像需锁定准确平台 digest，不能以移动 tag 作为安装身份。
-3. 运行通用发布工具进行结构、引用、权限和软件身份校验，并生成目录/资源校验和。
-4. 离线签名目录并发布静态文件；NAS 商店验证后刷新目录。
+把 `192.168.3.56` 改为实际 NAS 地址，并确认官方 API 为 `5055`、已有受管安装控制器为 `18441`。控制器的 NAS 身份来源须与 UI_PUBLIC_ORIGIN 相同。当前 NAS 已部署 UI，不要在同一端口同时启动第二个实例；迁移保留原控制器和数据。
 
-自定义图标可使用内容寻址素材，也可直接用清单的 monogram 图标。版本发布后不覆盖；配置或软件变更新增交付。下架只阻止新安装，已有实例与数据保留。
+```yaml
+# Save as compose.yaml; replace all example NAS addresses together.
+name: zspace-ui
+services:
+  ui:
+    image: isle204/zspace-ui:2026.10.13-r3
+    platform: linux/amd64
+    user: 10001:10001
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    labels:
+      io.space-store.service: space-store
+      io.space.role: ui
+    ports: ["192.168.3.56:18436:18436"]
+    environment:
+      NAS_ORIGIN: http://192.168.3.56:5055
+      UI_PUBLIC_ORIGIN: http://192.168.3.56:18436
+      SPACE_STORE_ENDPOINT: http://192.168.3.56:18441
+    volumes: [ui-data:/data]
+    # Optional authorized host Docker management: uncomment both additions,
+    # replace 989 with `stat -c '%g' /var/run/docker.sock`, then recreate ui.
+    # group_add: ["989"]
+    # Add "/var/run/docker.sock:/var/run/docker.sock:ro" to volumes above.
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
+    healthcheck:
+      test: [CMD-SHELL, "wget -qO- http://127.0.0.1:18436/healthz >/dev/null"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+volumes:
+  ui-data:
+```
 
-固定模板包括 `standard-v1`、`restricted-v1`、`host-monitor-v1`。选择模板不能自行扩权：宿主监控仍需要后端的明确策略授予。发布私钥不进入本仓库；秘密参数不写进清单、图标或版本目录。
-Docker application manifests and publishing protocol for the NAS app store
+```bash
+docker compose up -d
+```
 
-## 商店图文素材
+打开 `http://NAS_IP:18436/`。需要管理宿主 Docker 时，按 YAML 注释添加 socket 和其 GID；默认通过现有 NAS 服务访问设备，安装功能由已配置的本地控制器执行。
 
-`catalog/display.json`、`apps/` 与 `assets/icons/` 提供七个应用的中文说明和图标，供网页、客户端及后台使用。这是展示目录；原签名执行协议与 drafts 的状态仍按上文说明。
+## 云商店后台
+
+将 `SPACE_PUBLIC_ORIGIN` 改为实际 HTTPS 来源。这里仅绑定本机 `127.0.0.1:18442`，现有 HTTPS 反向代理转发到该端口；本机测试可以把来源改为 `http://127.0.0.1:18442`。当前 `zstore.2iwm.com` 已有后台，已有实例迁移需恢复原数据库、私有元数据和密码卷。
+
+```yaml
+# Save as compose.yaml. No .env, host secret file or deployment script required.
+name: zspace-store
+services:
+  secret-init:
+    image: isle204/zspace-store:2026.10.13-r3
+    platform: linux/amd64
+    restart: "no"
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [SETUID, SETGID]
+    security_opt: [no-new-privileges:true]
+    labels: {io.space-store.service: space-store, io.space.role: secret-init}
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        set +x
+        umask 077
+        task_secret=/secret-store/postgres-password
+        if [ -e "$$task_secret" ] || [ -L "$$task_secret" ]; then
+          [ -f "$$task_secret" ] && [ ! -L "$$task_secret" ] && [ -s "$$task_secret" ] &&
+            [ "$$(stat -c '%a' "$$task_secret")" = 600 ] || {
+              echo 'Existing database secret is invalid; restore the original secret.' >&2; exit 1;
+            }
+          exit 0
+        fi
+        # Both images create these data directories with private ownership.
+        # Switch to their owners to inspect without DAC override permissions.
+        task_pg_owner="$$(stat -c '%u:%g' /existing-postgres)"
+        task_catalog_owner="$$(stat -c '%u:%g' /data)"
+        task_pg_entries="$$(su-exec "$$task_pg_owner" ls -A /existing-postgres)"
+        task_catalog_entries="$$(su-exec "$$task_catalog_owner" ls -A /data)"
+        if [ -n "$$task_pg_entries" ] || [ -n "$$task_catalog_entries" ]; then
+          echo 'Persistent database or catalog data exists but its secret is missing. Restore the original secret volume.' >&2
+          exit 1
+        fi
+        chmod 700 /secret-store
+        set -C
+        od -An -N32 -tx1 /dev/urandom | tr -d ' \n' > "$$task_secret"
+        [ "$$(wc -c < "$$task_secret")" -eq 64 ]
+        chmod 600 "$$task_secret"
+    volumes:
+      - database-secret:/secret-store
+      - postgres-data:/existing-postgres:ro
+      - catalog-data:/data:ro
+  postgres:
+    image: postgres:17
+    platform: linux/amd64
+    restart: unless-stopped
+    labels: {io.space-store.service: space-store, io.space.role: database}
+    depends_on:
+      secret-init: {condition: service_completed_successfully}
+    environment:
+      POSTGRES_USER: zstore
+      POSTGRES_DB: zstore
+      POSTGRES_PASSWORD_FILE: /secret-store/postgres-password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - database-secret:/secret-store:ro
+    networks: [database]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U zstore -d zstore"]
+      interval: 10s
+      timeout: 3s
+      start_period: 15s
+      retries: 10
+  catalog:
+    image: isle204/zspace-store:2026.10.13-r3
+    platform: linux/amd64
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [SETUID, SETGID]
+    security_opt: [no-new-privileges:true]
+    labels: {io.space-store.service: space-store, io.space.role: catalog}
+    depends_on:
+      postgres: {condition: service_healthy}
+    ports: ["127.0.0.1:18442:18442"]
+    environment:
+      SPACE_PUBLIC_ORIGIN: https://zstore.example.com
+      SPACE_ADMIN_2FA_REQUIRED: "1"
+      SPACE_IMAGE_CACHE_DEFAULT_BYTES: "5368709120"
+      SPACE_DB_HOST: postgres
+      SPACE_DB_USER: zstore
+      SPACE_DB_NAME: zstore
+      SPACE_DB_PASSWORD_FILE: /secret-store/postgres-password
+    volumes:
+      - catalog-data:/data
+      - database-secret:/secret-store:ro
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
+    networks: [default, database]
+    healthcheck:
+      test: [CMD-SHELL, "wget -qO- http://127.0.0.1:18442/api/health >/dev/null"]
+      interval: 30s
+      timeout: 3s
+      start_period: 20s
+      retries: 3
+  setup:
+    profiles: [setup]
+    image: isle204/zspace-store:2026.10.13-r3
+    platform: linux/amd64
+    user: 10001:10001
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    labels: {io.space-store.service: space-store, io.space.role: setup}
+    stdin_open: true
+    tty: true
+    entrypoint: [/usr/local/bin/setup-admin]
+    volumes: [catalog-data:/data]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
+networks:
+  database:
+    internal: true
+volumes:
+  database-secret:
+  postgres-data:
+  catalog-data:
+```
+
+```bash
+docker compose up -d
+```
+
+数据库密码在首次运行时随机生成，保存在独立私有卷；重复运行沿用原密码。已有数据而密码丢失时初始化会停止，要求恢复原密码卷。
+
+首次初始化管理员，在这个 Compose 目录执行一条命令：
+
+```bash
+docker compose stop catalog && docker compose run --rm -it setup && docker compose up -d
+```
+
+按提示输入用户名、密码和确认密码，密码不回显。然后打开 `https://你的域名/admin/`，扫码并输入正确动态验证码完成 2FA 绑定。此命令的元数据引导服务仅监听容器内回环地址。
+
+四个持久卷保存 UI 数据、云私有元数据、PG 数据和 DB 密码。更新时只更换镜像版本并 `docker compose up -d`，保留数据卷。生产账户和目录状态不装入 Docker 镜像；新实例与已有服务的数据迁移见[备份与迁移](deploy/BACKUP.md)。
+
+应用公开目录提供 176 条记录：13 款有安装入口（6 个已有 NAS 配方及 7 个签名云交付），163 条公开资料待适配。新增 6 款通过本轮镜像与部署清单核验；未把核验失败的镜像或飞牛原生 FPK 声明为可安装。
+
+
+## 数据来源
+
+飞牛应用资料来源于 [conversun/fnos-apps](https://github.com/conversun/fnos-apps/tree/d297f9ac155b15a26b92632ee045ff4d530e2571)，固定提交 `d297f9ac155b15a26b92632ee045ff4d530e2571`；来源元资料按 GPLv3 归档，完整许可见 `sources/fnos/LICENSE`。具体应用软件与镜像按各自许可证使用，安装及首次配置由应用自身处理。
