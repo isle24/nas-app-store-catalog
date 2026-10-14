@@ -7,7 +7,47 @@
 - `drafts/` 保留历史协议示例，它们不是已发布安装源。`schemas/` 保存协议结构。
 - 用户账户、密码、令牌、签名私钥与 NAS 私有数据不在本仓库。
 
-源码在私有 [zspace-apps](https://github.com/isle24/zspace-apps)，使用 [UI 镜像](https://hub.docker.com/r/isle204/zspace-ui) 和 [后台镜像](https://hub.docker.com/r/isle204/zspace-store) 可直接部署。
+源码在私有 [zspace-apps](https://github.com/isle24/zspace-apps)，独立 NAS 商店使用 [zspace-shop 镜像](https://hub.docker.com/r/isle204/zspace-shop)；第三方桌面使用 [UI 镜像](https://hub.docker.com/r/isle204/zspace-ui)，中央管理后台使用 [后台镜像](https://hub.docker.com/r/isle204/zspace-store)。
+
+<!-- standalone-shop-start -->
+## 独立商店 Docker（无需第三方桌面）
+
+只需要应用商店的极空间玩家，部署 `isle204/zspace-shop:2026.10.14-r1` 即可。首次在网页创建本地管理员账号，之后使用自己的商店账号登录；无需第三方 UI、NAS 会话、SSH 初始化或 PostgreSQL。支持 AMD64、Docker 27.3 及以上。
+
+把 `NAS_IP` 改为自己的 NAS 地址，粘贴到极空间 Docker Compose：
+
+```yaml
+# Paste into ZSpace Docker Compose. Change NAS_IP to your NAS LAN address.
+name: zspace-shop
+services:
+  shop:
+    image: isle204/zspace-shop:2026.10.14-r1
+    platform: linux/amd64
+    network_mode: bridge
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    stop_grace_period: 45s
+    labels:
+      io.space-store.service: space-store
+      io.space.role: standalone-shop-bootstrap
+    environment:
+      NAS_IP: 192.168.3.56
+      SHOP_PORT: "18443"
+      # Optional: an unused dedicated folder on a physical NAS data disk.
+      # SHOP_DATA_ROOT: /data_n008/space-shop
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - shop-control:/control
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
+volumes:
+  shop-control:
+```
+
+启动后打开 `http://你的NAS地址:18443/`。引导服务自动创建并管理独立商店运行容器；数据保存在 NAS 物理数据盘上的独立目录，`shop-control` 保存部署记录。保留控制卷、目录和原配置，停止后重启会复用同一商店。云端账号用于安装云端发布的应用、备份与同步，可在商店内单独注册登录。
+
+<!-- standalone-shop-end -->
 
 ## Docker Compose 直接复制部署
 
