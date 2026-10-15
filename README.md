@@ -6,8 +6,9 @@
 - 签名安装目录：`catalog-envelope.json`、`catalog-key.json`、`catalogs/` 与 `manifests/`。当前 7 个云交付使用原签名身份与不可变摘要，NAS 另有 6 个已审查的内置配方。
 - `drafts/` 保留历史协议示例，它们不是已发布安装源。`schemas/` 保存协议结构。
 - 用户账户、密码、令牌、签名私钥与 NAS 私有数据不在本仓库。
+- [2026-10-15 更新与验收](RELEASE-2026-10-15.md)：最新镜像、真实 NAS 验收及 Compose 部署入口。
 
-源码在私有 [zspace-apps](https://github.com/isle24/zspace-apps)，独立 NAS 商店使用 [zspace-shop 镜像](https://hub.docker.com/r/isle204/zspace-shop)；第三方桌面使用 [UI 镜像](https://hub.docker.com/r/isle204/zspace-ui)，中央管理后台使用 [后台镜像](https://hub.docker.com/r/isle204/zspace-store)。
+源码在 [zspace-apps](https://github.com/isle24/zspace-apps)，独立 NAS 商店使用 [zspace-shop 镜像](https://hub.docker.com/r/isle204/zspace-shop)；第三方桌面使用 [UI 镜像](https://hub.docker.com/r/isle204/zspace-ui)，中央管理后台使用 [后台镜像](https://hub.docker.com/r/isle204/zspace-store)。
 
 <!-- combined-ui-shop-start -->
 ## UI 和商店合并部署
