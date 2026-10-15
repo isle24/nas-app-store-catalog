@@ -2,7 +2,7 @@
 
 ## SSH 一键安装（UI＋商店）
 
-支持 Linux AMD64、Docker 20.10 及以上，已在 20.10.24、24.0.9、26.1.4 实测。登录 NAS 的 SSH 后执行，自动识别局域网地址，无需宿主安装 Compose：
+支持 Linux AMD64、Docker 20.10 及以上，已在 20.10.24、24.0.9、26.1.4 实测。登录 NAS 的 SSH 后执行，自动识别本机 IP 和真实固态数据盘，在该盘创建专用目录并保存 `compose.yaml` 后启动，无需宿主安装 Compose：
 
 ```sh
 installer="$(mktemp /tmp/zspace-install.XXXXXX)" && curl -fsSL https://zstore.2iwm.com/install.sh -o "$installer" && sh "$installer"
