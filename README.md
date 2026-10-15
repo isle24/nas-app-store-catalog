@@ -1,5 +1,16 @@
 # NAS 应用商店目录与部署
 
+## SSH 一键安装（UI＋商店）
+
+支持 Linux AMD64、Docker 20.10 及以上，已在 20.10.24、24.0.9、26.1.4 实测。登录 NAS 的 SSH 后执行，自动识别局域网地址，无需宿主安装 Compose：
+
+```sh
+installer="$(mktemp /tmp/zspace-install.XXXXXX)" && curl -fsSL https://zstore.2iwm.com/install.sh -o "$installer" && sh "$installer"
+```
+
+只装商店加 `--shop-only`，指定 NAS 地址加 `--ip NAS_IP`，只读检查加 `--check`。首次账号在网页创建；已有项目会停止安装并保留资源。[完整用法](https://github.com/isle24/zspace-apps/blob/main/docs/deployment/ssh-install.md)。
+
+
 当前商店公开 176 条应用记录，其中 13 款提供安装入口，163 条资料明确标注待适配。飞牛来源的 175 项均已收录，另保留 nasReader；原生 FPK 与复杂 Docker 定义不会被伪装成可安装的单容器。
 
 - 公共资料：`catalog-apps.json`，以及 [服务器公开目录](https://zstore.2iwm.com/api/cloud/public-catalog)。
@@ -13,7 +24,7 @@
 <!-- combined-ui-shop-start -->
 ## UI 和商店合并部署
 
-适用于全新部署的 AMD64 极空间，Docker 27.3 或更新版本，NAS 官方服务使用默认 5055 端口。把下面所有 `192.168.3.56` 替换为自己的 NAS 局域网 IP，直接粘贴到 Docker Compose 即可；不需要 `.env`、SSH 初始化或 PostgreSQL。
+适用于全新部署的 AMD64 极空间，Docker 20.10 或更新版本，NAS 官方服务使用默认 5055 端口。把下面所有 `192.168.3.56` 替换为自己的 NAS 局域网 IP，直接粘贴到 Docker Compose 即可；不需要 `.env`、SSH 初始化或 PostgreSQL。
 
 ```yaml
 # Replace every 192.168.3.56 with your NAS LAN IP. Fresh AMD64 ZSpace deployment.
@@ -81,7 +92,7 @@ volumes:
 <!-- standalone-shop-start -->
 ## 独立商店 Docker（无需第三方桌面）
 
-只需要应用商店的极空间玩家，部署 `isle204/zspace-shop:latest` 即可。首次在网页创建本地管理员账号，之后使用自己的商店账号登录；无需第三方 UI、NAS 会话、SSH 初始化或 PostgreSQL。支持 AMD64、Docker 27.3 及以上。
+只需要应用商店的极空间玩家，部署 `isle204/zspace-shop:latest` 即可。首次在网页创建本地管理员账号，之后使用自己的商店账号登录；无需第三方 UI、NAS 会话、SSH 初始化或 PostgreSQL。支持 AMD64、Docker 20.10 及以上。
 
 把 `NAS_IP` 改为自己的 NAS 地址，粘贴到极空间 Docker Compose：
 
@@ -122,7 +133,7 @@ volumes:
 
 ## Docker Compose 直接复制部署
 
-镜像使用 `latest`；UI 当前版本为 `2026.10.15-r5`，独立商店与云后台为 `2026.10.15-r2`，平台 `linux/amd64`。新用户使用上方组合配置；下方独立 UI 示例适用于已有受管控制器的部署，云后台示例用于自行运营目录。
+镜像使用 `latest`；UI 当前版本为 `2026.10.15-r5`，独立商店为 `2026.10.15-r3`，云后台为 `2026.10.15-r2`，平台 `linux/amd64`。新用户使用上方组合配置；下方独立 UI 示例适用于已有受管控制器的部署，云后台示例用于自行运营目录。
 
 ## NAS 三方 UI
 
