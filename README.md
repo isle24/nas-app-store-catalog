@@ -21,6 +21,16 @@ installer="$(mktemp /tmp/zspace-install.XXXXXX)" && curl -fsSL https://zstore.2i
 
 源码在 [zspace-apps](https://github.com/isle24/zspace-apps)，独立 NAS 商店使用 [zspace-shop 镜像](https://hub.docker.com/r/isle204/zspace-shop)；第三方桌面使用 [UI 镜像](https://hub.docker.com/r/isle204/zspace-ui)，中央管理后台使用 [后台镜像](https://hub.docker.com/r/isle204/zspace-store)。
 
+## 已安装用户更新／恢复中断安装
+
+2026-10-16 更新修复部分旧引擎默认命名空间导致的初始化错误，并补齐 UI 的官方新设备短信验证。使用默认一键安装的用户直接执行，无需填写 NAS IP 或安装宿主 Compose：
+
+```sh
+updater="$(mktemp /tmp/zspace-update.XXXXXX)" && curl -fsSL https://zstore.2iwm.com/update.sh -o "$updater" && sh "$updater"
+```
+
+权限不足时执行 `sudo sh "$updater"`。更新复用原 `/data_*/zspace-suite/compose.yaml` 和数据目录；自定义项目通过自己的原 Compose 更新。UI 提示新设备验证时，点击发送验证码，输入绑定手机收到的验证码，再验证登录。[完整安装／更新说明](SSH-INSTALL.md) · [本次修复与验证](RELEASE-2026-10-16.md)。
+
 <!-- combined-ui-shop-start -->
 ## UI 和商店合并部署
 
@@ -133,7 +143,7 @@ volumes:
 
 ## Docker Compose 直接复制部署
 
-镜像使用 `latest`；UI 当前版本为 `2026.10.15-r5`，独立商店为 `2026.10.15-r3`，云后台为 `2026.10.15-r2`，平台 `linux/amd64`。新用户使用上方组合配置；下方独立 UI 示例适用于已有受管控制器的部署，云后台示例用于自行运营目录。
+镜像使用 `latest`；UI 当前版本为 `2026.10.16-r2`，独立商店为 `2026.10.16-r1`，云后台为 `2026.10.15-r2`，平台 `linux/amd64`。新用户使用上方组合配置；下方独立 UI 示例适用于已有受管控制器的部署，云后台示例用于自行运营目录。
 
 ## NAS 三方 UI
 
